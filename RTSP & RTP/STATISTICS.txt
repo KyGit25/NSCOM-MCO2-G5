@@ -1,0 +1,68 @@
+----------------------------
+	BASE DATA
+----------------------------
+DATA BASED ON FILE USED:
+File name: movie.Mjpeg
+File size: 4,269,893 Bytes
+
+DATA BASED ON CLI OUTPUT:
+Total # of Expected Packets: 500
+Total # of Received Packets: 500
+
+DATA BASED ON WIRESHARK:
+RTP Session Duration: approximately 31.08 seconds
+  > First Packet: UTC Arrival Time: Apr  3, 2025 15:43:32.030147000 UTC
+  > Final Packet: UTC Arrival Time: Apr  3, 2025 15:44:03.108336000 UTC
+
+
+
+-----------------------------------
+	CALCULATION OF DATA
+-----------------------------------
+RTP Packet Loss Rate:
+# of Expected Packets = 500, # of Received Packets = 500.
+Formula: (Lost Packets / # of Expected Packets ) x 100
+Calculation: (0 / 500) x 100
+	     = 0%
+RTP Packet Loss Rate = 0%
+
+Video Data Rate: 
+File Size: 4,269,893 Bytes
+Session Duration: 31.08 seconds
+Bps (Bytes per second) Formula: File Size / Session Duration
+Calculation: 4,269,893 / 31.08
+	     = 137383.94 Bps
+KBps (Kilobytes per second) Formula: Bps / 1024
+Calculation: 137383.94 / 1024
+	     = 134.16 KBps
+Mbps (Megabits per second) Formula: Bps x 8 / 1,000,000
+Calculation: 137383.94 x 8 / 1,000,000
+	     = 1.10 Mbps
+Video Data Rate = 137383.94 Bps OR 134.16 KBps OR 1.10 Mbps
+
+Average Packet Size:
+File Size: 4,269,893 Bytes
+# of Received Packets = 500
+Formula: Total Size / Packets Received
+Calculation: 4,269,893 / 500
+	     = 8539.79
+Average Packet Size = 8539.79 Bytes
+
+Packet Rate:
+# of Received Packets = 500
+Session Duration: 31.08 seconds
+Formula: # of Received Packets / Session Duration
+Calculation: 500 / 31.08
+	     = 16.09
+Packet Rate = 16.09 packets per second
+
+
+
+
+-------------------------------
+	CALCULATED DATA
+-------------------------------
+RTP Packet Loss Rate = 0%
+Video Data Rate = 137383.94 Bps OR 134.16 KBps OR 1.10 Mbps
+Average Packet Size = 8539.79 Bytes
+Packet Rate = 16.09 packets per second
