@@ -26,14 +26,13 @@ This project implements a **VoIP (Voice over IP)** system in Python using:
 ```
 /NSCOM-MCO2-G5/
 ├── code/
-│   ├── main.py                 # Entry point     
-│   ├── VoIPClientGUI.py        # GUI + client logic
-│   ├── SipClient.py            # SIP signaling logic
-│   ├── MicStreamer.py          # RTP mic stream sender
-│   ├── AudioReceiver.py        # RTP receiver & playback
-│   ├── AudioSender.py          # RTP sender 
+│   ├── run_voip.py             # Entry point     
+│   ├── Server.py               # Server
+│   ├── Client.py               # Client
+│   ├── AudioStream.py          # RTP audio stream 
+│   ├── audio.wav               # Audio test file
+│   ├── ServerWorker.py         # Server Worker
 │   └── RtpPacket.py            # RTP packet creation/decoding
-├── sample.wav              # Audio test file
 └── README.md               # You're here
 ```
 
@@ -55,15 +54,21 @@ sudo apt install portaudio19-dev python3-pyaudio
 
 ## 🚀 How to Run
 
-### ✅ Launch Client 1
+### ✅ Launch Server
 ```bash
-python main.py
+python Server.py 6060
 ```
 
-### ✅ Launch Client 2
+### ✅ Launch Client 1 (Caller)
 - On another terminal/PC (same LAN), also run:
 ```bash
-python main.py
+python run_voip.py caller 127.0.0.1 5060 127.0.0.1 6060 5004 audio.wav
+```
+
+### ✅ Launch Client 2 (Callee)
+- On another terminal/PC (same LAN), also run:
+```bash
+python run_voip.py callee 127.0.0.1 6060 127.0.0.1 5060 5006
 ```
 
 ### 📞 Making a Call
