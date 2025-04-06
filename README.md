@@ -120,15 +120,7 @@ python main.py
 
 ---
 
-## 📚 References
-
-- RFC 3261: [SIP Protocol](https://datatracker.ietf.org/doc/html/rfc3261)
-- RFC 3550: [RTP Protocol](https://datatracker.ietf.org/doc/html/rfc3550)
-- RFC 4566: [SDP Format](https://datatracker.ietf.org/doc/html/rfc4566)
-
----
-
 ## 👨‍💻 Authors
 
-*Student Name(s)*  
+*Maristela, Kyle and San Luis, Owen*  
 *NSCOM01 – Term 2 AY 2025-2026*  
