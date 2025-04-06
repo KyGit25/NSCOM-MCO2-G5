@@ -2,9 +2,11 @@ import tkinter as tk
 from SipClient import SipClient
 from AudioSender import AudioSender
 from AudioReceiver import AudioReceiver
+from MicStreamer import MicStreamer
 
 class VoIPClientGUI:
     def __init__(self, master):
+        self.mic_sender = None
         self.master = master
         master.title("VoIP Audio Client")
 
@@ -35,24 +37,29 @@ class VoIPClientGUI:
     def start_call(self):
         self.remote_ip = self.ip_entry.get()
         self.status.config(text="Status: Calling...")
-
+    
+        # SIP negotiation
         self.sip = SipClient(self.local_ip, self.local_sip_port, self.remote_ip, self.remote_sip_port, self.audio_port)
         self.sip.send_invite()
-
+    
+        # Start receiving audio
         self.receiver = AudioReceiver(self.audio_port, rtcp_port=self.rtcp_port)
         self.receiver.start_receiving()
-
-        self.sender = AudioSender(self.audio_file, self.remote_ip, self.audio_port, rtcp_port=self.rtcp_port)
-        self.sender_thread = threading.Thread(target=self.sender.start_stream)
-        self.sender_thread.start()
-
+    
+        # Start microphone audio streaming (instead of AudioSender from file)
+        self.mic_sender = MicStreamer(dest_ip=self.remote_ip, dest_port=self.audio_port)
+        self.mic_sender.start()
+    
         self.status.config(text="Status: In Call")
 
+
     def end_call(self):
-        if self.sender:
-            self.sender.stop_stream()
+        if self.mic_sender:
+            self.mic_sender.stop()
         if self.receiver:
             self.receiver.stop_receiving()
         if self.sip:
             self.sip.send_bye()
+    
         self.status.config(text="Status: Call Ended")
+
