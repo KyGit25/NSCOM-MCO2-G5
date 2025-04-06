@@ -1,33 +1,33 @@
 from SIPClient import SIPClient
 from AudioReceiver import AudioReceiver
+from MicStreamer import MicStreamer
 import time
 
-# Configuration
 LOCAL_IP = "127.0.0.1"
 LOCAL_SIP_PORT = 6060
-RTP_PORT = 7078  # Any unused UDP port
-RTCP_PORT = RTP_PORT + 1
+RTP_PORT = 7078
 REMOTE_IP = "127.0.0.1"
 REMOTE_SIP_PORT = 5060
+use_mic_reply = False  # 🔄 Set to True to enable mic-based two-way reply
 
-# Start SIP client
 sip = SIPClient(LOCAL_IP, LOCAL_SIP_PORT, REMOTE_IP, REMOTE_SIP_PORT)
-
 receiver = None
+reply_streamer = None
 
-# Handle incoming INVITE
 def handle_invite(msg):
     print("[CLIENT 2] INVITE received")
     sip.send_ok()
 
-# Handle ACK to start audio playback
 def handle_ack(msg):
     print("[CLIENT 2] ACK received. Starting audio receiver...")
-    global receiver
+    global receiver, reply_streamer
     receiver = AudioReceiver(LOCAL_IP, RTP_PORT)
     receiver.start_receiving()
 
-# Handle BYE to end call
+    if use_mic_reply:
+        reply_streamer = MicStreamer(REMOTE_IP, RTP_PORT)
+        reply_streamer.stream_microphone()
+
 def handle_bye(msg):
     print("[CLIENT 2] BYE received. Ending call.")
     if receiver:
@@ -39,7 +39,6 @@ sip.on_ack = handle_ack
 sip.on_bye = handle_bye
 sip.start_listener()
 
-# Keep main thread alive
 try:
     while True:
         time.sleep(1)
