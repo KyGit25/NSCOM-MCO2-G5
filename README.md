@@ -24,15 +24,15 @@ This project implements a **VoIP (Voice over IP)** system in Python using:
 ## 📁 File Structure
 
 ```
-/voip-audio
-│
-├── main.py                 # Entry point
-├── VoIPClientGUI.py        # GUI + client logic
-├── SipClient.py            # SIP signaling logic
-├── MicStreamer.py          # RTP mic stream sender
-├── AudioReceiver.py        # RTP receiver & playback
-├── RtpPacket.py            # RTP packet creation/decoding
-├── sample.wav              # Optional: audio test file
+/NSCOM-MCO2-G5/
+├── code/
+│   ├── main.py                 # Entry point     
+│   ├── VoIPClientGUI.py        # GUI + client logic
+│   ├── SipClient.py            # SIP signaling logic
+│   ├── MicStreamer.py          # RTP mic stream sender
+│   ├── AudioReceiver.py        # RTP receiver & playback
+│   └── RtpPacket.py            # RTP packet creation/decoding
+├── sample.wav              # Audio test file
 └── README.md               # You're here
 ```
 
