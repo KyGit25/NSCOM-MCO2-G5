@@ -1,4 +1,3 @@
-# SipClient.py
 import socket
 
 class SipClient:
