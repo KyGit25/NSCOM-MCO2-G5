@@ -1,6 +1,7 @@
 import tkinter as tk
 from sip_signaling import SIPSignaling
 from rtp_receiver import RTPReceiver
+from mic_sender import MicSender  # ← NEW
 
 class VoIPClient2:
     def __init__(self, master):
@@ -41,6 +42,12 @@ class VoIPClient2:
             rtp_port=self.rtp_port
         )
 
+        self.mic = MicSender(self.remote_ip, self.rtp_port)  # ← NEW mic sender
+        self.mic_on = False  # ← NEW state tracker
+        self.mic_btn = tk.Button(master, text="Mic ON", command=self.toggle_mic)  # ← Button
+        self.mic_btn.pack(pady=5)  # ← Add button to GUI
+
+
         self.start_listening()
 
     def log(self, message):
@@ -76,6 +83,23 @@ class VoIPClient2:
         self.play_btn.config(state=tk.DISABLED)
         self.teardown_btn.config(state=tk.DISABLED)
         self.sip.call_active = False  # Reset flag
+
+    def toggle_mic(self):
+        if not self.sip.call_active:
+            self.log("Mic can't start before call is active.")
+            return
+
+        if not self.mic_on:
+            self.log("Microphone streaming started.")
+            self.mic.start()
+            self.mic_btn.config(text="Mic OFF")
+        else:
+            self.log("Microphone streaming stopped.")
+            self.mic.stop()
+            self.mic_btn.config(text="Mic ON")
+
+        self.mic_on = not self.mic_on
+
 
 # Run GUI
 if __name__ == "__main__":
