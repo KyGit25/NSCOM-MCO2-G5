@@ -24,13 +24,16 @@ This project implements a **VoIP (Voice over IP)** system using:
 ## 📁 File Structure
 
 ```
-/voip-project/
-├── sip_signaling.py       # SIP protocol logic
-├── rtp_sender.py          # RTP packet construction + audio streaming
-├── rtp_receiver.py        # RTP reception + audio playback
-├── rtcp_sender.py         # RTCP sender report generator
-├── voip_gui_client1.py    # Caller GUI (sends INVITE and audio)
-├── voip_gui_client2.py    # Callee GUI (accepts call, plays audio)
+NSCOM-MCO2-G5/
+│
+├── code/   
+│   ├── audio.wav              # sample audio file
+│   ├── rtp_sender.py          # RTP packet construction + audio streaming
+│   ├── rtp_receiver.py        # RTP reception + audio playback
+│   ├── rtcp_sender.py         # RTCP sender report generator
+│   ├── voip_gui_client1.py    # Caller GUI (sends INVITE and audio)
+│   ├── voip_gui_client2.py    # Callee GUI (accepts call, plays audio)
+│   └── sip_signaling.py       # SIP protocol logic
 └── README.md              # You're here
 ```
 
