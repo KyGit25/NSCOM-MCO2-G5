@@ -5,6 +5,7 @@ from tkinter import filedialog
 from sip_signaling import SIPSignaling
 from rtp_sender import RTPSender
 from rtcp_sender import RTCPSender
+from mic_sender import MicSender
 
 class VoIPClient1:
     def __init__(self, master):
@@ -52,6 +53,11 @@ class VoIPClient1:
             remote_ip=self.remote_ip,
             rtcp_port=self.rtcp_port
         )
+
+        self.mic = MicSender(self.remote_ip, self.rtp_port)  # ← NEW mic sender
+        self.mic_on = False  # ← NEW state tracker
+        self.mic_btn = tk.Button(master, text="Mic ON", command=self.toggle_mic)  # ← Button
+        self.mic_btn.pack(pady=5)  # ← Add button to GUI
 
     def select_audio_file(self):
         filepath = filedialog.askopenfilename(filetypes=[("WAV files", "*.wav")])
@@ -108,6 +114,23 @@ class VoIPClient1:
         self.rtcp.stop()
         self.call_btn.config(state=tk.NORMAL)
         self.end_btn.config(state=tk.DISABLED)
+        
+    def toggle_mic(self):
+        if not self.sip.call_active:
+            self.log("Mic can't start before call is active.")
+            return
+
+        if not self.mic_on:
+            self.log("Microphone streaming started.")
+            self.mic.start()
+            self.mic_btn.config(text="Mic OFF")
+        else:
+            self.log("Microphone streaming stopped.")
+            self.mic.stop()
+            self.mic_btn.config(text="Mic ON")
+
+        self.mic_on = not self.mic_on
+
 
 # Run GUI
 if __name__ == "__main__":
