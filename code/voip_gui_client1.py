@@ -18,7 +18,7 @@ class VoIPClient1:
         self.select_btn = tk.Button(master, text="Choose Audio File", command=self.select_audio_file)
         self.select_btn.pack(pady=5)
 
-        self.call_btn = tk.Button(master, text="Start Call", command=self.start_call)
+        self.call_btn = tk.Button(master, text="Start Call", command=self.start_call, state=tk.DISABLED)
         self.call_btn.pack(pady=5)
 
         self.end_btn = tk.Button(master, text="End Call", command=lambda: self.end_call("Ending call..."), state=tk.DISABLED)
@@ -31,7 +31,7 @@ class VoIPClient1:
         self.sip_port_remote = 6060
         self.rtp_port = 5004
         self.rtcp_port = 5005
-        self.audio_file = "audio.wav"  # Ensure this exists
+        self.audio_file = None
 
         # Initialize objects
         self.sip = SIPSignaling(
@@ -42,16 +42,12 @@ class VoIPClient1:
             rtp_port=self.rtp_port
         )
 
-        self.rtp = RTPSender(
-            rtp_ip=self.remote_ip,
-            rtp_port=self.rtp_port,
-            audio_path=self.audio_file
-        )
-
         self.rtcp = RTCPSender(
             remote_ip=self.remote_ip,
             rtcp_port=self.rtcp_port
         )
+
+        self.rtp = None
 
     def select_audio_file(self):
         filepath = filedialog.askopenfilename(filetypes=[("WAV files", "*.wav")])
@@ -70,7 +66,13 @@ class VoIPClient1:
             return
 
         self.audio_file = filepath
+        self.rtp = RTPSender(
+            rtp_ip=self.remote_ip,
+            rtp_port=self.rtp_port,
+            audio_path=self.audio_file
+        )
         self.log(f"Audio file loaded: {os.path.basename(filepath)}")
+        self.call_btn.config(state=tk.NORMAL)
 
 
     def log(self, text):
@@ -83,8 +85,9 @@ class VoIPClient1:
                 self.log("[SIP] Receiver ended the call.")
                 self.rtp.stop()
                 self.rtcp.stop()
-                self.call_btn.config(state=tk.NORMAL)
                 self.end_btn.config(state=tk.DISABLED)
+                self.audio_file = None
+
         self.master.after(500, self.check_call_status)
 
     def start_call(self):
@@ -118,7 +121,7 @@ class VoIPClient1:
         self.sip.send_bye()
         self.rtp.stop()
         self.rtcp.stop()
-        self.call_btn.config(state=tk.NORMAL)
+        self.audio_file = None
         self.end_btn.config(state=tk.DISABLED)
 
 # Run GUI
