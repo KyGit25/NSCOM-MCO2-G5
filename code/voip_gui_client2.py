@@ -57,13 +57,23 @@ class VoIPClient2:
 
     def check_call_status(self):
         if self.sip.call_active:
-            self.log("[SIP] Call Active. Press 'Play' to start audio.")
-            self.status_label.config(text="Call Active", fg="green")
-            self.play_btn.config(state=tk.NORMAL)
-            self.pause_btn.config(state=tk.DISABLED)
-            self.teardown_btn.config(state=tk.NORMAL)
+            if self.status_label.cget("text") != "Call Active":
+                self.log("[SIP] Call Active. Press 'Play' to start audio.")
+                self.status_label.config(text="Call Active", fg="green")
+                self.play_btn.config(state=tk.NORMAL)
+                self.pause_btn.config(state=tk.DISABLED)
+                self.teardown_btn.config(state=tk.NORMAL)
         else:
-            self.master.after(500, self.check_call_status)
+            if self.status_label.cget("text") == "Call Active":
+                self.log("[SIP] Caller ended the call.")
+                self.status_label.config(text="Waiting for call...", fg="blue")
+                self.rtp.stop()
+                self.play_btn.config(state=tk.DISABLED)
+                self.pause_btn.config(state=tk.DISABLED)
+                self.teardown_btn.config(state=tk.DISABLED)
+                self.master.after(1000, self.start_listening)
+
+        self.master.after(500, self.check_call_status)
 
     def play_audio(self):
         if not self.rtp.running:
@@ -92,6 +102,8 @@ class VoIPClient2:
         self.pause_btn.config(state=tk.DISABLED)
         self.teardown_btn.config(state=tk.DISABLED)
         self.sip.call_active = False  # Reset flag
+
+        self.sip.send_bye()
 
         # allow listen again
         self.master.after(1000, self.start_listening)
