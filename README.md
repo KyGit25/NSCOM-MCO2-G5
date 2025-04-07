@@ -1,51 +1,53 @@
 # 🎧 Real-Time Audio Streaming over IP (NSCOM01 – MCO2)
 
-This project implements a **VoIP (Voice over IP)** system in Python using:
-- SIP over UDP for session setup and teardown
-- RTP for real-time audio streaming (from file or microphone)
-- RTCP for simple quality statistics
-- A Tkinter GUI for control and interaction
+This project implements a **VoIP (Voice over IP)** system using:
+- **SIP over UDP** for call signaling (INVITE, 200 OK, ACK, BYE)  
+- **RTP** for audio transmission using audio files  
+- **RTCP** for periodic quality feedback  
+- **Tkinter GUI** for easy call control by both caller and receiver
 
 ---
 
 ## 📦 Features
 
-✅ SIP Handshake  
-✅ SDP Negotiation (with codec/port)  
-✅ RTP Audio Streaming (from mic)  
-✅ RTP Audio Playback (real-time)  
-✅ RTCP Reporting  
-✅ GUI-based Call Control  
-✅ Two-Way Voice Communication (mic-to-mic)  
-✅ Error Handling and Cleanup
+✅ SIP Handshake with custom SDP  
+✅ RTP Audio Streaming from audio file  
+✅ RTP Playback at receiver  
+✅ RTCP Sender Reports (packet, byte stats)  
+✅ GUI Interfaces for Caller and Receiver  
+✅ Basic error handling (timeouts, format checks)  
+✅ Call teardown with proper cleanup  
+✅ G.711 (PCM µ-law) audio compatibility  
 
 ---
 
 ## 📁 File Structure
 
 ```
-/NSCOM-MCO2-G5/
-├── code/
-│   ├── run_voip.py             # Entry point     
-│   ├── Server.py               # Server
-│   ├── Client.py               # Client
-│   ├── AudioStream.py          # RTP audio stream 
-│   ├── audio.wav               # Audio test file
-│   ├── ServerWorker.py         # Server Worker
-│   └── RtpPacket.py            # RTP packet creation/decoding
-└── README.md               # You're here
+NSCOM-MCO2-G5/
+│
+├── code/   
+│   ├── audio.wav              # sample audio file
+│   ├── rtp_sender.py          # RTP packet construction + audio streaming
+│   ├── rtp_receiver.py        # RTP reception + audio playback
+│   ├── rtcp_sender.py         # RTCP sender report generator
+│   ├── voip_gui_client1.py    # Caller GUI (sends INVITE and audio)
+│   ├── voip_gui_client2.py    # Callee GUI (accepts call, plays audio)
+│   └── sip_signaling.py       # SIP protocol logic
+└── README.md              # You're here
 ```
 
 ---
 
 ## ⚙️ Requirements
 
-Install these Python packages first:
+Install Python 3 and the following packages:
+
 ```bash
 pip install pyaudio
 ```
 
-> 🔐 On Linux, you may also need:
+> On Linux, install this first if needed:
 ```bash
 sudo apt install portaudio19-dev python3-pyaudio
 ```
@@ -54,79 +56,68 @@ sudo apt install portaudio19-dev python3-pyaudio
 
 ## 🚀 How to Run
 
-### ✅ Launch Server
+### ✅ 1. Run Callee (Client 2)
 ```bash
-python Server.py 6060
+python voip_gui_client2.py
 ```
+- Listens for INVITE on `127.0.0.1:6060`
+- Waits for call, then can **Play**, **Pause**, or **Teardown**
 
-### ✅ Launch Client 1 (Caller)
-- On another terminal/PC (same LAN), also run:
+### ✅ 2. Run Caller (Client 1)
 ```bash
-python run_voip.py caller 127.0.0.1 5060 127.0.0.1 6060 5004 audio.wav
+python voip_gui_client1.py
 ```
-
-### ✅ Launch Client 2 (Callee)
-- On another terminal/PC (same LAN), also run:
-```bash
-python run_voip.py callee 127.0.0.1 6060 127.0.0.1 5060 5006
-```
-
-### 📞 Making a Call
-1. In the first window, enter the **remote IP** (e.g., `127.0.0.1` if local)
-2. Click **Call**
-3. Speak into your mic and listen on the other side
-4. Click **Hang Up** to end the session
+- Click “Choose Audio File” to select a valid `.wav` file (must be mono, 8kHz, 16-bit)
+- Click **Start Call** to initiate SIP signaling and stream RTP audio
 
 ---
 
-## 💡 Implemented SIP Flow
+## 📞 SIP Flow Overview
 
-- `INVITE` ➝ sent to initiate call
-- `200 OK` ➝ received with SDP info
-- `ACK` ➝ confirms setup
-- `BYE` ➝ sent to end call
+1. **Caller** sends `INVITE` with SDP details
+2. **Callee** replies with `200 OK`
+3. **Caller** sends `ACK` to confirm
+4. **RTP** media stream begins (Caller → Callee)
+5. **BYE** ends the call session
 
 ---
 
 ## 🧪 Test Cases
 
-| Test Description                 | Expected Result                                      |
-|----------------------------------|------------------------------------------------------|
-| Call established (INVITE → OK)   | "Call Started", GUI shows `Status: In Call`         |
-| Speak into mic                   | Remote client plays voice via speakers              |
-| End call (BYE sent)              | Status updates to `Call Ended`, resources released  |
-| SIP Error (invalid address)      | Logs 4xx/5xx and GUI shows failed connection        |
+| Test Scenario                        | Expected Behavior                                  |
+|-------------------------------------|----------------------------------------------------|
+| Caller selects invalid audio file   | GUI shows error message                            |
+| Caller clicks “Start Call”          | Logs “INVITE sent”, waits for “200 OK”             |
+| Callee accepts call                 | Logs SIP response, enables “Play” button           |
+| RTP audio plays on Callee side      | Clear audio received through speakers              |
+| Click “End Call” or “Teardown”      | Stops RTP, resets GUI, SIP BYE sent                |
+| SIP packet dropped (e.g. BYE lost)  | Call ends after timeout or GUI manual stop         |
 
 ---
 
 ## 🛠️ Error Handling
 
-- Gracefully handles:
-  - SIP errors (4xx, 5xx)
-  - Socket timeouts
-  - Microphone access failure
-- Proper teardown on GUI close or Hang Up
+- **Audio Format Check:** Only accepts mono, 16-bit, 8kHz WAV files
+- **SIP Timeouts:** Automatically logs and resets on unacknowledged calls
+- **Exception Catching:** Catches socket/audio errors with fallback messages
+- **Safe Teardown:** Cleans up audio, sockets, and GUI threads properly
 
 ---
 
-## 📷 Sample Output (Terminal)
+## 📷 Sample Output (Console)
 
 ```
 [SIP] INVITE sent
-[SIP] 200 OK received
-[SIP] ACK sent
-[RTP] Microphone streaming started.
-[RTP] Listening on port 5004...
-[RTP] Received Seq=20 Len=160
-...
+[SIP] 200 OK received. Sending ACK.
+[RTP] Playing audio stream.
+[RTCP] Sent Sender Report.
+[RTP] Finished sending audio.
 [SIP] BYE sent
-[RTP] Microphone streaming stopped.
-[RTP] Receiver stopped.
 ```
 
 ---
 
-## 👨‍💻 Authors
+## 🧑‍💻 Authors
 
-*Maristela, Kyle and San Luis, Owen*  
-*NSCOM01 – Term 2 AY 2025-2026*  
+**Kyle Maristela & Owen San Luis**  
+*NSCOM01 – Term 2 AY 2025-2026*
