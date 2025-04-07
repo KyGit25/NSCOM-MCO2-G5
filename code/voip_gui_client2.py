@@ -20,7 +20,7 @@ class VoIPClient2:
         self.pause_btn = tk.Button(master, text="Pause", command=self.pause_audio, state=tk.DISABLED)
         self.pause_btn.pack(pady=5)
 
-        self.teardown_btn = tk.Button(master, text="Teardown", command=self.end_call, state=tk.DISABLED)
+        self.teardown_btn = tk.Button(master, text="End Call", command=self.end_call, state=tk.DISABLED)
         self.teardown_btn.pack(pady=10)
 
         # Configs
@@ -95,7 +95,7 @@ class VoIPClient2:
         self.pause_btn.config(state=tk.DISABLED)
 
     def end_call(self):
-        self.log("[SIP] Call ended by receiver.")
+        self.log("[SIP] Ending call...")
         self.status_label.config(text="Waiting for call...", fg="blue")
         self.rtp.stop()
         self.play_btn.config(state=tk.DISABLED)

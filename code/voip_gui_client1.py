@@ -77,6 +77,16 @@ class VoIPClient1:
         self.log_box.insert(tk.END, text + "\n")
         self.log_box.see(tk.END)
 
+    def check_call_status(self):
+        if not self.sip.call_active:
+            if self.end_btn['state'] == tk.NORMAL:
+                self.log("[SIP] Receiver ended the call.")
+                self.rtp.stop()
+                self.rtcp.stop()
+                self.call_btn.config(state=tk.NORMAL)
+                self.end_btn.config(state=tk.DISABLED)
+        self.master.after(500, self.check_call_status)
+
     def start_call(self):
         if not self.audio_file:
             self.log("Please choose an audio file before calling.")
@@ -89,6 +99,7 @@ class VoIPClient1:
 
         # Wait a moment for 200 OK, then start RTP
         self.master.after(1000, self.start_media)
+        self.master.after(500, self.check_call_status)
 
 
     def start_media(self, retries=10):
