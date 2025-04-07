@@ -22,7 +22,7 @@ class VoIPClient1:
         self.call_btn = tk.Button(master, text="Start Call", command=self.start_call)
         self.call_btn.pack(pady=5)
 
-        self.end_btn = tk.Button(master, text="End Call", command=self.end_call, state=tk.DISABLED)
+        self.end_btn = tk.Button(master, text="End Call", command=lambda: self.end_call("Ending call..."), state=tk.DISABLED)
         self.end_btn.pack(pady=5)
 
         # Network and Audio Config (Edit these for your local test)
@@ -96,19 +96,19 @@ class VoIPClient1:
         # Wait a moment for 200 OK, then start RTP
         self.master.after(1000, self.start_media)
 
-
-    def start_media(self):
+    def start_media(self, retries=10):
         if self.sip.call_active:
             self.log("Call accepted. Starting RTP + RTCP...")
             self.rtp.start(rtcp_sender=self.rtcp)
             self.rtcp.start()
-
-        else:
+        elif retries > 0:
             self.log("Waiting for call to be accepted...")
-            self.master.after(500, self.start_media)
+            self.master.after(500, lambda: self.start_media(retries - 1))
+        else:
+            self.end_call("Call not accepted. Timing out...")
 
-    def end_call(self):
-        self.log("Ending call...")
+    def end_call(self, message):
+        self.log(message)
         self.sip.send_bye()
         self.rtp.stop()
         self.rtcp.stop()

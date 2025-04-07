@@ -71,6 +71,9 @@ class VoIPClient2:
     def play_audio(self):
         if not self.rtp.running:
             self.log("[RTP] Playing audio stream.")
+            self.rtp.stop()
+            self.rtp = RTPReceiver(local_ip=self.local_ip, rtp_port=self.rtp_port)
+
             self.rtp.start()
         else:
             self.log("[RTP] Audio already playing.")
@@ -83,6 +86,9 @@ class VoIPClient2:
         self.play_btn.config(state=tk.DISABLED)
         self.teardown_btn.config(state=tk.DISABLED)
         self.sip.call_active = False  # Reset flag
+
+        # allow listen again
+        self.master.after(1000, self.start_listening)
 
     def toggle_mic(self):
         if not self.sip.call_active:

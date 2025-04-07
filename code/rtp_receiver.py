@@ -36,6 +36,8 @@ class RTPReceiver:
                 audio = self.parse_rtp_packet(data)
                 self.stream.write(audio)
             except Exception as e:
+                if not self.running:
+                    break
                 print("[RTP] Error:", e)
 
         print("[RTP] Stopped receiving.")
