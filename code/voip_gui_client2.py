@@ -17,9 +17,6 @@ class VoIPClient2:
         self.play_btn = tk.Button(master, text="Play", command=self.play_audio, state=tk.DISABLED)
         self.play_btn.pack(pady=5)
 
-        self.pause_btn = tk.Button(master, text="Pause", command=self.pause_audio, state=tk.DISABLED)
-        self.pause_btn.pack(pady=5)
-
         self.teardown_btn = tk.Button(master, text="Teardown", command=self.end_call, state=tk.DISABLED)
         self.teardown_btn.pack(pady=10)
 
@@ -60,7 +57,6 @@ class VoIPClient2:
             self.log("[SIP] Call Active. Press 'Play' to start audio.")
             self.status_label.config(text="Call Active", fg="green")
             self.play_btn.config(state=tk.NORMAL)
-            self.pause_btn.config(state=tk.DISABLED)
             self.teardown_btn.config(state=tk.NORMAL)
         else:
             self.master.after(500, self.check_call_status)
@@ -72,21 +68,12 @@ class VoIPClient2:
         else:
             self.log("[RTP] Audio already playing.")
         self.play_btn.config(state=tk.DISABLED)
-        self.pause_btn.config(state=tk.NORMAL)
-
-    def pause_audio(self):
-        if self.rtp.running:
-            self.log("[RTP] Audio paused.")
-            self.rtp.stop()
-        self.play_btn.config(state=tk.NORMAL)
-        self.pause_btn.config(state=tk.DISABLED)
 
     def end_call(self):
         self.log("[SIP] Call ended by receiver.")
         self.status_label.config(text="Waiting for call...", fg="blue")
         self.rtp.stop()
         self.play_btn.config(state=tk.DISABLED)
-        self.pause_btn.config(state=tk.DISABLED)
         self.teardown_btn.config(state=tk.DISABLED)
         self.sip.call_active = False  # Reset flag
 
